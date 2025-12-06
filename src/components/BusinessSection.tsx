@@ -1,26 +1,9 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { Star, MapPin } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { Button } from '@/components/ui/button';
-
-interface Business {
-    id: number;
-    slug: string;
-    nameEn: string;
-    nameFr: string;
-    nameAr: string;
-    aboutEn: string | null;
-    aboutFr: string | null;
-    aboutAr: string | null;
-    logoUrl: string | null;
-    type: string;
-    addressEn: string | null;
-    addressFr: string | null;
-    addressAr: string | null;
-    images?: string[];
-}
+import { BusinessCard, Business } from '@/components/BusinessCard';
 
 interface BusinessSectionProps {
     title: string;
@@ -38,25 +21,6 @@ export default function BusinessSection({
     viewAllLink = '/explore'
 }: BusinessSectionProps) {
     const t = useTranslations('landing');
-    const tBooking = useTranslations('booking');
-
-    const getBusinessName = (business: Business) => {
-        return business.nameEn || business.nameFr || business.nameAr || 'Business';
-    };
-
-    const getBusinessLocation = (business: Business) => {
-        return business.addressEn || business.addressFr || business.addressAr || 'Location';
-    };
-
-    const getBusinessImage = (business: Business) => {
-        if (business.images && business.images.length > 0) {
-            return business.images[0];
-        }
-        if (business.logoUrl) {
-            return business.logoUrl;
-        }
-        return `https://placehold.co/400x300/e5e7eb/6b7280?text=${encodeURIComponent(getBusinessName(business))}`;
-    };
 
     if (loading) {
         return (
@@ -105,53 +69,7 @@ export default function BusinessSection({
                 {/* Business Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {businesses.map((business) => (
-                        <div
-                            key={business.id}
-                            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
-                        >
-                            {/* Cover Image */}
-                            <div className="relative h-48 bg-gray-200 overflow-hidden">
-                                <img
-                                    src={getBusinessImage(business)}
-                                    alt={getBusinessName(business)}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    onError={(e) => {
-                                        const target = e.currentTarget;
-                                        target.src = `https://placehold.co/400x300/e5e7eb/6b7280?text=${encodeURIComponent(getBusinessName(business))}`;
-                                    }}
-                                />
-                            </div>
-
-                            {/* Content */}
-                            <div className="p-4 space-y-3">
-                                {/* Name and Rating */}
-                                <div className="space-y-1">
-                                    <h3 className="font-bold text-lg text-gray-900 truncate">
-                                        {getBusinessName(business)}
-                                    </h3>
-                                    <div className="flex items-center gap-1">
-                                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                        <span className="text-sm font-semibold text-gray-900">5.0</span>
-                                        <span className="text-sm text-gray-500">(New)</span>
-                                    </div>
-                                </div>
-
-                                {/* Location */}
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <MapPin className="w-4 h-4 flex-shrink-0" />
-                                    <span className="text-sm truncate">
-                                        {getBusinessLocation(business)}
-                                    </span>
-                                </div>
-
-                                {/* Book Button */}
-                                <Link href={`/book/${business.slug}`} className="block">
-                                    <Button className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-medium">
-                                        {t('bookNow')}
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
+                        <BusinessCard key={business.id} business={business} />
                     ))}
                 </div>
             </div>

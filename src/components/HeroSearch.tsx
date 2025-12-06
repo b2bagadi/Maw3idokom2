@@ -1,23 +1,36 @@
-"use client";
-
 import { useTranslations } from 'next-intl';
-import { Search, MapPin } from 'lucide-react';
-import { useState } from 'react';
-import { useRouter } from '@/i18n/routing';
+import { Search, MapPin, Store } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-export default function HeroSearch() {
+interface HeroSearchProps {
+    onSearch: (service: string, location: string) => void;
+    onToggleView: (view: 'list' | 'map') => void;
+    currentView: 'list' | 'map';
+    initialService?: string;
+    initialLocation?: string;
+}
+
+export default function HeroSearch({
+    onSearch,
+    onToggleView,
+    currentView,
+    initialService = '',
+    initialLocation = ''
+}: HeroSearchProps) {
     const t = useTranslations('landing');
-    const router = useRouter();
-    const [service, setService] = useState('');
-    const [location, setLocation] = useState('');
+    const [service, setService] = useState(initialService);
+    const [location, setLocation] = useState(initialLocation);
+
+    useEffect(() => {
+        setService(initialService);
+    }, [initialService]);
+
+    useEffect(() => {
+        setLocation(initialLocation);
+    }, [initialLocation]);
 
     const handleSearch = () => {
-        // Navigate to explore page with search parameters
-        const params = new URLSearchParams();
-        if (service) params.set('service', service);
-        if (location) params.set('location', location);
-
-        router.push(`/explore${params.toString() ? '?' + params.toString() : ''}`);
+        onSearch(service, location);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -79,7 +92,6 @@ export default function HeroSearch() {
 
                         {/* Mobile Stacked Search */}
                         <div className="md:hidden space-y-3">
-                            {/* Service Input */}
                             <div className="flex items-center bg-white rounded-2xl shadow-lg border border-gray-200 px-4 py-4">
                                 <Search className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
                                 <input
@@ -92,7 +104,6 @@ export default function HeroSearch() {
                                 />
                             </div>
 
-                            {/* Location Input */}
                             <div className="flex items-center bg-white rounded-2xl shadow-lg border border-gray-200 px-4 py-4">
                                 <MapPin className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
                                 <input
@@ -105,7 +116,6 @@ export default function HeroSearch() {
                                 />
                             </div>
 
-                            {/* Search Button */}
                             <button
                                 onClick={handleSearch}
                                 className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-200 hover:shadow-lg"
@@ -113,6 +123,30 @@ export default function HeroSearch() {
                                 {t('searchButton')}
                             </button>
                         </div>
+                    </div>
+
+                    {/* Map/List View Toggles - Styled like Explore Page */}
+                    <div className="flex justify-center gap-2 animate-fade-in-up delay-200">
+                        <button
+                            onClick={() => onToggleView('list')}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium ${currentView === 'list'
+                                    ? 'bg-gray-900 text-white border border-gray-900'
+                                    : 'bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:border-teal-500 hover:text-teal-600'
+                                }`}
+                        >
+                            <Store className="h-4 w-4" />
+                            {t('viewList')}
+                        </button>
+                        <button
+                            onClick={() => onToggleView('map')}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium ${currentView === 'map'
+                                    ? 'bg-gray-900 text-white border border-gray-900'
+                                    : 'bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:border-teal-500 hover:text-teal-600'
+                                }`}
+                        >
+                            <MapPin className="h-4 w-4" />
+                            {t('viewMap')}
+                        </button>
                     </div>
                 </div>
             </div>
